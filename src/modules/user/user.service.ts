@@ -1,27 +1,69 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { getRepository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
-  
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  async create(createUserDto: CreateUserDto) {
+    try {
+      // const user = new User();
+      const userRepo = await getRepository(User);
+      const result = await userRepo.save({
+        name: createUserDto.name,
+      });
+      return result;
+    } catch (error) {
+      throw new InternalServerErrorException('error in user create service.');
+    }
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async findAll() {
+    try {
+      const userRepo = await getRepository(User);
+      const result = await userRepo.find();
+      return result;
+    } catch (error) {
+      throw new InternalServerErrorException('error in users service.');
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number) {
+    try {
+      const userRepo = await getRepository(User);
+      const result = await userRepo.findOne({
+        where: {
+          id,
+        },
+      });
+      return result;
+    } catch (error) {
+      throw new InternalServerErrorException('error in users service.');
+    }
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    try {
+      const userRepo = await getRepository(User);
+      const result = await userRepo.update(
+        { id },
+        { name: updateUserDto.name },
+      );
+      return result;
+    } catch (error) {
+      throw new InternalServerErrorException('error in users service.');
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    try {
+      const userRepo = await getRepository(User);
+      const result = await userRepo.delete({ id });
+      return result;
+    } catch (error) {
+      throw new InternalServerErrorException('error in users service.');
+    }
   }
 }
